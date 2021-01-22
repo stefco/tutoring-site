@@ -1,0 +1,36 @@
+.crafting-table {
+	display: flex;
+  	/* background-color: #ccc; */
+}
+
+.crafting-table-container {
+	display: flex;
+  	background-color: #ccc;
+  	align-items: center;
+  	flex-basis: auto;
+}
+
+.crafting-table-container > .crafting-table-input {
+	padding-right: 1em;
+}
+
+.inventory-table {
+	padding: 1em;
+}
+
+.inventory-table td {
+	height: 2em;
+	width: 2em;
+	border: 0.1em solid black;
+	position: relative;
+	margin: 2em;
+	background-color: #888;
+}
+
+.inventory-table td:hover {
+	background-color: #666;
+}
+
+.inventory-table {
+	background-color: #ccc;
+}
