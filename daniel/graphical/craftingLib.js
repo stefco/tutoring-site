@@ -6,12 +6,12 @@ function blockElementFromName(name, src=undefined) {
 			"This block already exists, can't redefine: "+
 			String(name)
 		);
-		console.log(msg);
+		//console.log(msg);
 		throw msg;
 	}
 	if (!(blockDefined || reDefined)) {
 		var msg = "Block type not defined: "+String(name);
-		console.log(msg);
+		//console.log(msg);
 		throw msg;
 	}
 	name = String(name);
@@ -24,10 +24,39 @@ function blockElementFromName(name, src=undefined) {
 	domElement.classList.add("block-" + name);
 	domElement.name = name;
 	domElement.src = src;
+	dragElement(domElement);
+	//domElement.onclick = function(e){console.log("Clicked on block: ");
+	//				 console.log(e);};
 	return domElement;
 }
 
+function mouseupClosure(s, c) {
+	return function(e) {
+		if (c.readonly) {
+			blockDragTracker.setLast(null);
+		} else if (blockDragTracker.getLast() !== null) {
+			for (var i=0; i<blockDragTracker.getLast().classList.length; i++) {
+				if (blockDragTracker.getLast().classList[i] === 'block') {
+					c.addBlock(
+						...InventoryTable.indexOf(s),
+						blockDragTracker.getLast()
+					);
+					blockDragTracker.setLast(null);
+					return;
+				}
+			}
+		}
+	};
+}
+
 class InventoryTable {
+	addBlock(row, col, block) {
+		if (block.parentElement !== null) {
+			block.parentElement.removeChild(block);
+		}
+		this.slot(row, col).appendChild(block);
+	}
+
 	constructor(rows, columns, readonly=false) {
 		if (rows <= 0) {
 			throw ("Must have a positive # of rows, not: " +
@@ -51,6 +80,7 @@ class InventoryTable {
 				s.controller = this;
 				s.classList.add("inventory-slot");
 				d.appendChild(s);
+				d.onmouseenter = mouseupClosure(s, this);
 				r.appendChild(d);
 			}
 		}
@@ -62,6 +92,22 @@ class InventoryTable {
 
 	get cols() {
 		return this.domElement.childNodes[0].childNodes.length;
+	}
+
+	get contents() {
+		var content = [];
+		var rows = this.rows;
+		var cols = this.cols;
+		for (var i=0; i<rows; i++) {
+			content[i] = []
+			for (var j=0; j<cols; j++) {
+				content[i][j] = this.block(i, j);
+				if (content[i][j] !== null) {
+					content[i][j] = content[i][j].name;
+				}
+			}
+		}
+		return content;
 	}
 
 	slot(row, col) {
@@ -103,13 +149,6 @@ class InventoryTable {
 				", " + String(col));
 		}
 		this.addBlock(row, col, blockElementFromName(name, src));
-	}
-
-	addBlock(row, col, block) {
-		if (block.parentElement !== null) {
-			block.parentElement.removeChild(block);
-		}
-		this.slot(row, col).appendChild(block);
 	}
 }
 

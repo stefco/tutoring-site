@@ -37,10 +37,13 @@
 .block {
 	width: 1.5em;
 	height: 1.5em;
+	position: absolute;
+	z-index: 10;
 }
 
 .inventory-slot {
 	display: flex;
+	position: relative;
   	align-items: center;
 	justify-content: center;
   	flex-basis: auto;
