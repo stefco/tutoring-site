@@ -1,6 +1,5 @@
 .crafting-table {
 	display: flex;
-  	/* background-color: #ccc; */
 }
 
 .crafting-table-container {
@@ -12,6 +11,39 @@
 
 .crafting-table-container > .crafting-table-input {
 	padding-right: 1em;
+}
+
+.crafting-table-button {
+	/* background-color: #ac8; */
+	background-color: #ca8;
+	padding: 0.5em;
+	text-align: center;
+	border: 0.1em solid black;
+	margin: 1em;
+}
+
+.crafting-table-button:hover {
+	text-decoration: line-through;
+}
+
+.crafting-table-button-valid {
+	background-color: #ad8;
+}
+
+.crafting-table-button-valid:hover {
+	background-color: #ac8;
+}
+
+.block {
+	width: 1.5em;
+	height: 1.5em;
+}
+
+.inventory-slot {
+	display: flex;
+  	align-items: center;
+	justify-content: center;
+  	flex-basis: auto;
 }
 
 .inventory-table {
