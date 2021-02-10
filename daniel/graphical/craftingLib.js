@@ -1,4 +1,4 @@
-function blockElementFromName(name, src=undefined) {
+function blockElementFromName(name, src=undefined, draggable=true) {
 	var blockDefined = BLOCKS.includes(name);
 	var reDefined = !(src === undefined);
 	if (blockDefined && reDefined) {
@@ -24,28 +24,63 @@ function blockElementFromName(name, src=undefined) {
 	domElement.classList.add("block-" + name);
 	domElement.name = name;
 	domElement.src = src;
+	domElement.dataset.draggable = draggable
 	dragElement(domElement);
 	//domElement.onclick = function(e){console.log("Clicked on block: ");
 	//				 console.log(e);};
 	return domElement;
 }
 
+class RecipeRegistry {
+	constructor(recipes) {
+		this.recipes = recipes
+	}
+
+	checkContents(contents) {
+		var notFound = false;
+		for (const blockName in this.recipes) {
+			var recipe = this.recipes[blockName];
+			for (var i = 0; i<contents.length; i++) {
+				for (var j = 0; j<contents[i].length; j++) {
+					if ((recipe[i] === undefined) || (recipe[i][j] !== contents[i][j])) {
+						console.log(`breaking on ${i}, ${j} with ${recipe[i][j]} !== ${contents[i][j]}`);
+						notFound = true;
+						break;
+					}
+				}
+				if (notFound) {
+					break;
+				}
+			}
+			if (notFound) {
+				notFound = false;
+			} else {
+				return blockName;
+			}
+		}
+		return null;
+	}
+}
+
 function mouseupClosure(s, c) {
 	return function(e) {
+		var last = blockDragTracker.getLast()
+		var modified = false;
 		if (c.readonly) {
 			blockDragTracker.setLast(null);
-		} else if (blockDragTracker.getLast() !== null) {
-			for (var i=0; i<blockDragTracker.getLast().classList.length; i++) {
-				if (blockDragTracker.getLast().classList[i] === 'block') {
-					c.addBlock(
-						...InventoryTable.indexOf(s),
-						blockDragTracker.getLast()
-					);
+		} else if (last !== null) {
+			var [row, col] = InventoryTable.indexOf(s)
+			for (var i=0; i<last.classList.length; i++) {
+				if ((c.block(row, col) === null) &&
+					(last.classList[i] === 'block')) {
+					c.addBlock(row, col, last);
 					blockDragTracker.setLast(null);
-					return;
+					modified = true;
+					break;
 				}
 			}
 		}
+		// TODO call observers in crafting table controller
 	};
 }
 
@@ -143,12 +178,12 @@ class InventoryTable {
 		return slot[0];
 	}
 
-	newBlock(row, col, name, src=undefined) {
+	newBlock(row, col, name, src=undefined, draggable=true) {
 		if (this.block(row, col) !== null) {
 			throw ("Slot already filled: " + String(row) +
 				", " + String(col));
 		}
-		this.addBlock(row, col, blockElementFromName(name, src));
+		this.addBlock(row, col, blockElementFromName(name, src, draggable));
 	}
 }
 
@@ -183,5 +218,15 @@ class CraftingTable {
 		this.domElement = document.createElement("div");
 		this.domElement.classList.add("crafting-table");
 		this.domElement.appendChild(container);
+		// this.domElement.onmouseenter = function(e){
+		// 	var output = this.recipes.checkContents(this.input.contents);
+		// 	if (output !== null) {
+		// 		var block = this.output.block(0,0);
+		// 		if (block.parentElement !== null) {
+		// 			block.parentElement.removeChild(block);
+		// 		}
+		// 		this.output.newBlock(0, 0, output);
+		// 	}
+		// }
 	}
 }

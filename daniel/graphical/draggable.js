@@ -16,6 +16,7 @@ function dragElement(elmnt) {
 
   function dragMouseDown(e) {
     e = e || window.event;
+	if (e.target.dataset.draggable != "true") { return; }
     e.preventDefault();
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
