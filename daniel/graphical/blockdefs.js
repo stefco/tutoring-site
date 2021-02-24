@@ -360,5 +360,6 @@ var BLOCKS = [
     "redstoneoreglowing",
     "leatherleggings",
     "bluewool",
-    "glassbottle"
+    "glassbottle",
+    "diamondswordbow"
 ];
